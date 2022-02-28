@@ -22,5 +22,8 @@
   "dependencies": {
     "@hjp-cli-dev/utils": "^1.0.2"
   },
-  "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930"
+  "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930",
+  "publishConfig":{
+    "access":"public"
+  }
 }
