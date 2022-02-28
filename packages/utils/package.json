@@ -1,0 +1,21 @@
+{
+  "name": "@hjp-cli-dev/utils",
+  "version": "1.0.0",
+  "description": "hjp-cli-dev utils",
+  "author": "huangjipeng <1319639755@qq.com>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "lib/index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Run testing from utils\""
+  },
+  "dependencies": {
+  }
+}
