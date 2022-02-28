@@ -1,6 +1,6 @@
 {
   "name": "@hjp-cli-dev/utils",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "hjp-cli-dev utils",
   "author": "huangjipeng <1319639755@qq.com>",
   "homepage": "",
@@ -17,7 +17,7 @@
     "test": "echo \"Run testing from utils\""
   },
   "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930",
-  "publishConfig":{
-    "access":"public"
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@hjp-cli-dev/core",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "@hjp-cli-dev core",
   "author": "huangjipeng <1319639755@qq.com>",
   "homepage": "",
@@ -20,10 +20,10 @@
     "test": "echo \"Run testing from core\""
   },
   "dependencies": {
-    "@hjp-cli-dev/utils": "^1.0.2"
+    "@hjp-cli-dev/utils": "^1.0.3"
   },
   "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930",
-  "publishConfig":{
-    "access":"public"
+  "publishConfig": {
+    "access": "public"
   }
 }
