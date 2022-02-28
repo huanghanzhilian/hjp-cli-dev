@@ -6,6 +6,9 @@
   "homepage": "",
   "license": "ISC",
   "main": "lib/core.js",
+  "bin": {
+    "hjp-cli-dev": "bin/index.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -18,5 +21,6 @@
   },
   "dependencies": {
     "@hjp-cli-dev/utils": "^1.0.1"
-  }
+  },
+  "gitHead": "29e8437ebea18393a9141d7b64eb35e0501063f8"
 }
