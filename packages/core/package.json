@@ -1,6 +1,6 @@
 {
   "name": "@hjp-cli-dev/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "@hjp-cli-dev core",
   "author": "huangjipeng <1319639755@qq.com>",
   "homepage": "",
@@ -17,6 +17,6 @@
     "test": "echo \"Run testing from core\""
   },
   "dependencies": {
-    "@hjp-cli-dev/utils": "^1.0.0"
+    "@hjp-cli-dev/utils": "^1.0.1"
   }
 }
