@@ -1,5 +1,11 @@
 .vscode
 .idea
 node_modules
+
 packages/**/node_modules
-lerna-debug.index
+commands/**/node_modules
+models/**/node_modules
+lerna-debug.log
+
+.DS_Store
+**/.DS_Store
