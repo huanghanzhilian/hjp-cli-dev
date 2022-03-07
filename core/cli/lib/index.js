@@ -10,9 +10,16 @@ const core = function () {
   try {
     checkVersion();
     checkLowNodeVersion();
+    checkRoot()
   } catch (e) {
     log.error(e.message)
   }
+}
+
+const checkRoot = function () {
+  const rootCheck = require('root-check');  // root降级，使用普通用户启动脚手架
+  rootCheck()
+  console.log(process.getuid())
 }
 
 const checkVersion = function () {

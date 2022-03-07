@@ -28,7 +28,7 @@
     "minimist": "^1.2.5",
     "npmlog": "^4.1.2",
     "path-exists": "^5.0.0",
-    "root-check": "^2.0.0",
+    "root-check": "^1.0.0",
     "semver": "^7.3.5"
   },
   "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930",
