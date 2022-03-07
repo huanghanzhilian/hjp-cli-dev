@@ -1,7 +1,9 @@
-'use strict';
+const pkg = require('../../../package.json');
 
-module.exports = core;
+const log = require('@hjp-cli-dev/log');
 
-function core() {
-  console.log('exec core hello')
+const core = function () {
+  log.notice('cli', pkg.version)
 }
+
+module.exports = core

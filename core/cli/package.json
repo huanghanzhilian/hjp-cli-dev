@@ -21,8 +21,9 @@
   },
   "dependencies": {
     "@hjp-cli-dev/utils": "file:../../utils/utils",
-    "import-local": "^3.1.0",
-    "npmlog": "^6.0.1"
+    "@hjp-cli-dev/log": "file:../../utils/log",
+    "import-local": "^2.0.0",
+    "npmlog": "^4.1.2"
   },
   "gitHead": "b893820efb1fa6acae54bbb48f85810acbb7b930",
   "publishConfig": {
