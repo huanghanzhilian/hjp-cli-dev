@@ -1,8 +1,11 @@
+const os = require('os');
+const path = require("path");
+
 const semver = require('semver');  // 对比版本号
 const colors = require("colors");  // 对输入的log染色
-const os = require('os');
 const pathExists = require('path-exists').sync; // 判断目标文件或文件夹是否存在
 const minimist = require("minimist"); // 解析参数
+const dotenv = require('dotenv');
 
 const pkg = require('../../../package.json');
 const log = require('@hjp-cli-dev/log');
@@ -19,9 +22,18 @@ const core = function () {
     checkUserHome()
     checkInputArgs()
     log.verbose('debug', 'test debug log')
+    checkEnv()
   } catch (e) {
     log.error(e.message)
   }
+}
+
+const checkEnv = function () {
+  const envPath = path.resolve(os.homedir(), '.env');
+  console.log(os.homedir())
+  dotenv.config({
+    path: envPath
+  })
 }
 
 const checkInputArgs = function () {
