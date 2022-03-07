@@ -7,14 +7,15 @@ const pathExists = require('path-exists').sync; // 判断目标文件或文件�
 const minimist = require("minimist"); // 解析参数
 const dotenv = require('dotenv');
 
-const pkg = require('../../../package.json');
+const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
+const {getNpmInfo} = require('@hjp-cli-dev/npm-info');
 
 const {NODE_LOW_VERSION} = require('./const');
 
 let args = null;
 
-const core = function () {
+const core = async function () {
   try {
     checkVersion()
     checkLowNodeVersion()
@@ -23,14 +24,21 @@ const core = function () {
     checkInputArgs()
     log.verbose('debug', 'test debug log')
     checkEnv()
+    await checkGlobalUpdate()
   } catch (e) {
     log.error(e.message)
   }
 }
 
+const checkGlobalUpdate = async function () {
+  const current = pkg.version;
+  const name = '@imooc-cli/core' //pkg.name;
+  const data = await getNpmInfo(name);
+  console.log(data)
+}
+
 const checkEnv = function () {
   const envPath = path.resolve(os.homedir(), '.env');
-  console.log(os.homedir())
   dotenv.config({
     path: envPath
   })
