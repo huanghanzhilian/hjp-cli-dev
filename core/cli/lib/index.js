@@ -9,7 +9,7 @@ const dotenv = require('dotenv');
 
 const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
-const {getNpmInfo} = require('@hjp-cli-dev/npm-info');
+const {getSemverNpmVersions} = require('@hjp-cli-dev/npm-info');
 
 const {NODE_LOW_VERSION} = require('./const');
 
@@ -31,10 +31,17 @@ const core = async function () {
 }
 
 const checkGlobalUpdate = async function () {
+  // 1.获取当前版本号
+  // 2.使用npm API获取最新版本号
+  // 3.对比脚手架版本提醒用户更新
   const current = pkg.version;
-  const name = '@imooc-cli/core' //pkg.name;
-  const data = await getNpmInfo(name);
-  console.log(data)
+  const name = pkg.name;
+  let versions = await getSemverNpmVersions(name, current);
+  let lastVersion = versions.length ? versions[0] : null;
+  if (lastVersion && semver.lt(current, lastVersion)) {
+    log.notice(colors.yellow(`新版本已推出！本地版本为${current},请手动更新到${lastVersion}
+        使用npm install ${name} -g 更新到最新版本`));
+  }
 }
 
 const checkEnv = function () {
