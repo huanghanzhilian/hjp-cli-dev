@@ -3,6 +3,7 @@ const colors = require("colors");  // 对输入的log染色
 
 const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
+const init = require('@hjp-cli-dev/init');
 
 const core = function (argv) {
   try {
@@ -22,6 +23,12 @@ const registerCommander = () => {
     .option('-d ,--debug', '开启debug模式', false)
     .option('-tp ,--targetPath <targetPath>', '执行路径', '')
 
+  // 注册命令
+  program
+    .command('init [projectName]')
+    .option('-f,-force','是否强制安装',false)
+    .action(init)
+
   // 启用debug模式
   program.on('option:debug', () => {
     process.env.LOG_LEVEL = program.opts().debug ? 'verbose' : 'info';
@@ -35,14 +42,14 @@ const registerCommander = () => {
     console.log(colors.red('可用命令：' + program.commands.map(cmd => cmd.name).join()));
   })
 
+  // 这句话要写在结尾， 解析参数
+  program.parse(process.argv)
+
   // 未输入命令打印帮助文档
   if(!program.args || !program.args.length){
     program.outputHelp()
     console.log();
   }
-
-  // 这句话要写在结尾， 解析参数
-  program.parse(process.argv);
 }
 
 

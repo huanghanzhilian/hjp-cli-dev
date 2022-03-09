@@ -23,6 +23,7 @@
     "@hjp-cli-dev/log": "file:../../utils/log",
     "@hjp-cli-dev/npm-info": "file:../../utils/npm-info",
     "@hjp-cli-dev/utils": "file:../../utils/utils",
+    "@hjp-cli-dev/init": "file:../../commands/init",
     "colors": "^1.4.0",
     "commander": "^7.0.0",
     "dotenv": "^16.0.0",
