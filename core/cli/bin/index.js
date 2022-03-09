@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const importLocal = require("import-local");
-console.log(__filename)
+
 if (importLocal(__filename)) {
   require("npmlog").info("cli", "正在使用 hjp-cli 本地版本");
 } else {

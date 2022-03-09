@@ -1,92 +1,49 @@
-const os = require('os');
-const path = require("path");
-
-const semver = require('semver');  // 对比版本号
+const { Command } = require('commander');
 const colors = require("colors");  // 对输入的log染色
-const pathExists = require('path-exists').sync; // 判断目标文件或文件夹是否存在
-const minimist = require("minimist"); // 解析参数
-const dotenv = require('dotenv');
 
 const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
-const {getSemverNpmVersions} = require('@hjp-cli-dev/npm-info');
 
-const {NODE_LOW_VERSION} = require('./const');
-
-let args = null;
-
-const core = async function () {
+const core = function (argv) {
   try {
-    checkVersion()
-    checkLowNodeVersion()
-    checkRoot()
-    checkUserHome()
-    checkInputArgs()
-    log.verbose('debug', 'test debug log')
-    checkEnv()
-    await checkGlobalUpdate()
+    registerCommander();
   } catch (e) {
     log.error(e.message)
   }
 }
 
-const checkGlobalUpdate = async function () {
-  // 1.获取当前版本号
-  // 2.使用npm API获取最新版本号
-  // 3.对比脚手架版本提醒用户更新
-  const current = pkg.version;
-  const name = pkg.name;
-  let versions = await getSemverNpmVersions(name, current);
-  let lastVersion = versions.length ? versions[0] : null;
-  if (lastVersion && semver.lt(current, lastVersion)) {
-    log.notice(colors.yellow(`新版本已推出！本地版本为${current},请手动更新到${lastVersion}
-        使用npm install ${name} -g 更新到最新版本`));
-  }
-}
+const program = new Command();
 
-const checkEnv = function () {
-  const envPath = path.resolve(os.homedir(), '.env');
-  dotenv.config({
-    path: envPath
+const registerCommander = () => {
+  program
+    .name(Object.keys(pkg.bin)[0])
+    .usage('<comment> [options]')
+    .version(pkg.version)
+    .option('-d ,--debug', '开启debug模式', false)
+    .option('-tp ,--targetPath <targetPath>', '执行路径', '')
+
+  // 启用debug模式
+  program.on('option:debug', () => {
+    process.env.LOG_LEVEL = program.opts().debug ? 'verbose' : 'info';
+    log.level = process.env.LOG_LEVEL;
+    log.verbose('已启用debug模式');
   })
-}
 
-const checkInputArgs = function () {
-  args = minimist(process.argv.slice(2));
-  checkArgs();
-}
+  // 未知命令处理
+  program.on('command:*', (obj) => {
+    console.log(colors.red('不存在的命令：' + obj[0]));
+    console.log(colors.red('可用命令：' + program.commands.map(cmd => cmd.name).join()));
+  })
 
-const checkArgs = function () {
-  if (args.debug) {
-    process.env.LOG_LEVEL = 'verbose';
-  } else {
-    process.env.LOG_LEVEL = 'info';
+  // 未输入命令打印帮助文档
+  if(!program.args || !program.args.length){
+    program.outputHelp()
+    console.log();
   }
-  log.level = process.env.LOG_LEVEL;
+
+  // 这句话要写在结尾， 解析参数
+  program.parse(process.argv);
 }
 
-const checkUserHome = () => {
-  const userHome = os.homedir();
-  if (!userHome || !pathExists(userHome)) {
-    throw new Error(colors.red('用户目录不存在！'))
-  }
-}
-
-const checkRoot = function () {
-  const rootCheck = require('root-check');  // root降级，使用普通用户启动脚手架
-  rootCheck()
-  // console.log(process.getuid())
-}
-
-const checkVersion = function () {
-  log.info('cli', pkg.version)
-}
-
-const checkLowNodeVersion = function () {
-  let current = process.version;
-  if (!semver.gte(current, NODE_LOW_VERSION)) {
-    throw new Error(colors.red(`不符合最低Node版本要求，要求最低${NODE_LOW_VERSION}`))
-  }
-}
 
 module.exports = core
