@@ -36,6 +36,11 @@ const registerCommander = () => {
     log.verbose('已启用debug模式');
   })
 
+  // 将option保存在环境变量，减少值传递
+  program.on('option:targetPath', () => {
+    process.env.CLI_TARGET_PATH = program.opts().targetPath
+  })
+
   // 未知命令处理
   program.on('command:*', (obj) => {
     console.log(colors.red('不存在的命令：' + obj[0]));
