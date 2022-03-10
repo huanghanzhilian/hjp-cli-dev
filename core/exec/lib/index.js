@@ -12,13 +12,15 @@ const cmd2Package = {
 function exec () {
   const cmdObj = arguments[arguments.length - 1]
   const cmdName = cmdObj.name()
-  const pkg = new Package({
+  const pkgIns = new Package({
     path: process.env.CLI_TARGET_PATH,
     storePath: process.env.CLI_HOME_PATH,
     name: cmd2Package[cmdName], // todo 应该取 init 指令的 projectName 参数？
     version: 'latest'
   })
-  console.log(pkg)
+  console.log(pkgIns)
+  const entryFilePath = pkgIns.getEntryFilePath()
+  console.log(entryFilePath)
 }
 
 module.exports = exec;

@@ -24,7 +24,8 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@hjp-cli-dev/utils": "file:../../utils/utils"
+    "@hjp-cli-dev/utils": "file:../../utils/utils",
+    "pkg-dir": "^5.0.0"
   },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"

@@ -19,6 +19,9 @@ const core = async (argv) => {
     registerCommander();
   } catch (e) {
     log.error(e.message)
+    if (log.level === 'verbose'){
+      log.error(e)
+    }
   }
 }
 
