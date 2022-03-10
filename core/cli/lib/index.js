@@ -4,6 +4,7 @@ const colors = require("colors");  // 对输入的log染色
 const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
 const init = require('@hjp-cli-dev/init');
+const exec = require('@hjp-cli-dev/exec')
 
 const core = function (argv) {
   try {
@@ -27,7 +28,7 @@ const registerCommander = () => {
   program
     .command('init [projectName]')
     .option('-f,-force','是否强制安装',false)
-    .action(init)
+    .action(exec)
 
   // 启用debug模式
   program.on('option:debug', () => {
