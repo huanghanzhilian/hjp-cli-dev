@@ -1,6 +1,6 @@
-const NODE_LOW_VERSION = '12.0.0';
-// const NODE_LOW_VERSION = '14.18.2';
-
+const LOWEST_NODE_VERSION = '12.0.0'
+const DEFAULT_CLI_HOME = '.hjp-cli'
 module.exports = {
-  NODE_LOW_VERSION
+  LOWEST_NODE_VERSION,
+  DEFAULT_CLI_HOME
 }

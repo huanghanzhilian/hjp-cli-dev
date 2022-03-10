@@ -1,17 +1,47 @@
+const path = require('path')
+const os = require('os')
+
 const { Command } = require('commander');
 const colors = require("colors");  // 对输入的log染色
+const {sync: pathExistsSync} = require("path-exists");
+const dotenv = require('dotenv')
 
 const pkg = require('../package.json');
 const log = require('@hjp-cli-dev/log');
 const init = require('@hjp-cli-dev/init');
 const exec = require('@hjp-cli-dev/exec')
+const userHome = os.homedir()
+const {LOWEST_NODE_VERSION, DEFAULT_CLI_HOME} = require('./const')
 
-const core = function (argv) {
+const core = async (argv) => {
   try {
+    await prepare()
     registerCommander();
   } catch (e) {
     log.error(e.message)
   }
+}
+
+function checkCliHome() {
+  const dotEnvFilePath = path.resolve(userHome, '.env')
+  if (pathExistsSync(dotEnvFilePath)) {
+    dotenv.config({
+      path: dotEnvFilePath
+    })
+  }
+  createDefaultCliPath()
+}
+
+function createDefaultCliPath() {
+  if (process.env.CLI_HOME) {
+    process.env.CLI_HOME_PATH = path.join(userHome, process.env.CLI_HOME)
+  } else {
+    process.env.CLI_HOME_PATH = path.join(userHome, DEFAULT_CLI_HOME)
+  }
+}
+
+async function prepare() {
+  checkCliHome()
 }
 
 const program = new Command();
