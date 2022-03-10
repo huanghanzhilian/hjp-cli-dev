@@ -19,11 +19,18 @@ const core = async (argv) => {
     registerCommander();
   } catch (e) {
     log.error(e.message)
-    if (log.level === 'verbose'){
+    if (program._optionValues.debug){
       log.error(e)
     }
   }
 }
+
+function rootCheck() {
+  // windows 无法使用 process.geteU
+  const fn = require('root-check') // 使用1.*版本 才可使用require
+  fn()
+}
+
 
 function checkCliHome() {
   const dotEnvFilePath = path.resolve(userHome, '.env')
@@ -44,6 +51,7 @@ function createDefaultCliPath() {
 }
 
 async function prepare() {
+  rootCheck()
   checkCliHome()
 }
 
@@ -72,7 +80,7 @@ const registerCommander = () => {
 
   // 将option保存在环境变量，减少值传递
   program.on('option:targetPath', () => {
-    process.env.CLI_TARGET_PATH = program.opts().targetPath
+    process.env.TARGET_PATH = program.opts().targetPath
   })
 
   // 未知命令处理

@@ -1,8 +1,12 @@
 'use strict';
+const path = require("path");
+
+const npminstall = require('npminstall')
+const getPkgDir = require('pkg-dir').sync
 
 const { isObject, formatPath } = require("@hjp-cli-dev/utils");
-const path = require("path");
-const getPkgDir = require('pkg-dir').sync
+const {getDefaultRegistryUrl} = require('@hjp-cli-dev/get-npm-info')
+
 
 class Package {
   constructor(options) {
@@ -18,19 +22,26 @@ class Package {
     // package 的存储路径
     this.storePath = options.storePath;
     // package 的name
-    this.name = options.name;
+    this.packageName = options.name;
     // package 的version
-    this.version = options.version;
+    this.packageVersion = options.version;
   }
 
   // 执行前Package是否存在
-  async exists() {
-
+  exists() {
+    return false
   }
 
   // 安装Package
   install() {
-
+    return npminstall({
+      root: this.path,
+      storeDir: this.storePath,
+      registry: getDefaultRegistryUrl(),
+      pkgs: [
+        {name: this.packageName, version: this.packageVersion}
+      ]
+    })
   }
 
   // 更新Package
@@ -45,8 +56,8 @@ class Package {
     // 3. 寻找main/lib - path
     // 4. 路径兼容（macOS/windows）
     const pkgRootDir = getPkgDir(this.path)
-    const pkgJsonDir = path.resolve(pkgRootDir, 'package.json')
-    const pkgJsonObj = require(pkgJsonDir)
+    const pkgJsonDir = pkgRootDir ? path.resolve(pkgRootDir, 'package.json') : null
+    const pkgJsonObj = pkgJsonDir ? require(pkgJsonDir) : null
     if (pkgJsonObj && pkgJsonObj.main) {
       return formatPath(path.resolve(pkgRootDir, pkgJsonObj.main))
     }

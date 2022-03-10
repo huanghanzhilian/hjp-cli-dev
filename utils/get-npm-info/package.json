@@ -1,5 +1,5 @@
 {
-  "name": "@hjp-cli-dev/package",
+  "name": "@hjp-cli-dev/get-npm-info",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "huangjipeng <1319639755@qq.com>",
@@ -24,10 +24,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@hjp-cli-dev/utils": "file:../../utils/utils",
-    "@hjp-cli-dev/get-npm-info": "file:../../utils/get-npm-info",
-    "npminstall": "^4.11.0",
-    "pkg-dir": "^5.0.0"
+    "axios": "^0.23.0",
+    "semver": "^7.3.5",
+    "url-join": "^4.0.1"
   },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
