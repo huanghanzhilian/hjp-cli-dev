@@ -1,5 +1,5 @@
 {
-  "name": "@hjp-cli-dev/exec",
+  "name": "@hjp-cli-dev/package",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "huangjipeng <1319639755@qq.com>",
@@ -22,9 +22,6 @@
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
-  },
-  "dependencies": {
-    "@hjp-cli-dev/package": "file:../../models/package"
   },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
