@@ -1,9 +1,10 @@
 'use strict';
 
 const path = require("path");
+const cp = require('child_process')
 
 const Package = require('@hjp-cli-dev/package')
-
+const log = require('@hjp-cli-dev/log')
 
 module.exports = exec;
 // 指令对应包的配置表
@@ -41,8 +42,41 @@ async function exec() {
   }
 
   const pkgRootFile = await pkgIns.getEntryFilePath()
+
   if (pkgRootFile) {
-    require(pkgRootFile).apply(null, arguments)
+    // require(pkgRootFile).apply(null, arguments)
+    /*处理参数
+    1、去掉parent 防止JSON.stringify报错
+    2、去掉以_开头的内部属性
+    * */
+    const commandObj = Object.create(null)
+    Object.entries(arguments[arguments.length - 1]).forEach(([key, val]) => {
+      if (!key.startsWith('_') && key !== 'commands' && key !== 'parent' || key === '_optionValueSources') {
+        commandObj[key] = val
+      }
+    })
+    arguments[arguments.length - 1] = commandObj
+    const code = `require('${pkgRootFile}').apply(null, ${JSON.stringify(Array.from(arguments))})`
+    const childProcess = compatibilitySpawn('node', ['-e', code], {
+      cwd: process.cwd(),
+      stdio: "inherit"
+    })
+    childProcess.on('error', err => {
+      console.log(err)
+      process.exit(1)
+    })
+    childProcess.on('exit', code => {
+      if (code === 0) log.info('Init command executed successfully\n')
+    })
+  }
+
+  function compatibilitySpawn(command, args, options) {
+    const win32 = process.platform === 'win32'
+
+    const cmd = win32 ? 'cmg' : command
+    const cmdArgs = win32 ? ['/c'].concat(command, args) : args
+
+    return cp.spawn(cmd, cmdArgs, options || {})
   }
 }
 
