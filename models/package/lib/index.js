@@ -1,12 +1,13 @@
 'use strict';
 
-const {isObject} = require("@hjp-cli-dev/utils/lib");
 const path = require("path");
-const {formatPath} = require("@hjp-cli-dev/utils");
+const {isObject, formatPath} = require("@hjp-cli-dev/utils");
 const getPkgDir = require('pkg-dir').sync
 const {getDefaultRegistryUrl, getLatestNpmVersion} = require('@hjp-cli-dev/get-npm-info')
 const pathExists = require('path-exists')
 const npminstall = require('npminstall')
+const SemVer = require("semver");
+
 
 class Package {
   constructor(options) {
@@ -45,7 +46,19 @@ class Package {
     })
   }
 
-  update() {
+  async update() {
+    const latestVersion = await getLatestNpmVersion(this.packageName, getDefaultRegistryUrl())
+    if (this.packageVersion !== 'latest') {
+      if (SemVer.lt(this.packageVersion, latestVersion))
+        return npmInstall({
+          root: this.path,
+          storeDir: this.storePath,
+          registry: getDefaultRegistryUrl(),
+          pkgs: [
+            {name: this.packageName, version: 'latest'}
+          ]
+        })
+    }
 
   }
 
