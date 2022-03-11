@@ -1,38 +1,39 @@
 'use strict';
+
+const {isObject} = require("@hjp-cli-dev/utils/lib");
 const path = require("path");
-
-const npminstall = require('npminstall')
+const {formatPath} = require("@hjp-cli-dev/utils");
 const getPkgDir = require('pkg-dir').sync
-
-const { isObject, formatPath } = require("@hjp-cli-dev/utils");
-const {getDefaultRegistryUrl} = require('@hjp-cli-dev/get-npm-info')
-
+const {getDefaultRegistryUrl, getLatestNpmVersion} = require('@hjp-cli-dev/get-npm-info')
+const pathExists = require('path-exists')
+const npminstall = require('npminstall')
 
 class Package {
   constructor(options) {
     if (!options) {
       throw new Error('argument of class Package\'s constructor is required!')
     }
-    if (!isObject(options)){
+    if (!isObject(options)) {
       throw new Error('argument of class Package\'s must be Object !')
     }
 
-    // package 的路径
-    this.path = options.path;
-    // package 的存储路径
-    this.storePath = options.storePath;
-    // package 的name
-    this.packageName = options.name;
-    // package 的version
-    this.packageVersion = options.version;
+    this.path = options.path
+    this.storePath = options.storePath
+    this.packageName = options.name
+    this.packageVersion = options.version
   }
 
-  // 执行前Package是否存在
-  exists() {
-    return false
+  async exists() {
+    if (this.storePath) {
+      //去storePath里找包对应文件夹
+      const pkgFileName = await genPackageFileNameByVersion(this.packageName,this.packageVersion)
+      return pathExists(path.resolve(this.storePath, pkgFileName))
+    } else {
+      // 判断指定目录的包是否存在
+      return !!getPkgDir(this.path)
+    }
   }
 
-  // 安装Package
   install() {
     return npminstall({
       root: this.path,
@@ -44,24 +45,34 @@ class Package {
     })
   }
 
-  // 更新Package
-  async update() {
+  update() {
 
   }
 
-  // 获取入口文件的路径
   getEntryFilePath() {
-    // 1. 获取package.json 所在目录 - pkg-dir
-    // 2. 读取package.json - require
-    // 3. 寻找main/lib - path
-    // 4. 路径兼容（macOS/windows）
     const pkgRootDir = getPkgDir(this.path)
-    const pkgJsonDir = pkgRootDir ? path.resolve(pkgRootDir, 'package.json') : null
-    const pkgJsonObj = pkgJsonDir ? require(pkgJsonDir) : null
+    const pkgJsonDir = path.resolve(pkgRootDir, 'package.json')
+    const pkgJsonObj = require(pkgJsonDir)
     if (pkgJsonObj && pkgJsonObj.main) {
       return formatPath(path.resolve(pkgRootDir, pkgJsonObj.main))
     }
   }
 }
+
+/**
+ *
+ * @param {string} packageName
+ * @param {string} version
+ */
+async function genPackageFileNameByVersion(packageName, version) {
+  let specificVersion = version
+  if (version === 'latest') {
+    specificVersion = await getLatestNpmVersion(packageName,getDefaultRegistryUrl())
+  }
+  //e.g. _path-exists@5.0.0@path-exists
+  //     _@imooc-cli_init@1.1.2@@imooc-cli
+  return `_${packageName.replace(/\//g,'_')}@${specificVersion}@${packageName.split('/')[0]}`
+}
+module.exports = Package;
 
 module.exports = Package;

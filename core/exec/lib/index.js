@@ -31,21 +31,22 @@ async function exec() {
     name: cmd2Package[cmdName],
     version: 'latest'
   })
-
-  if (!targetPath) {
-    if (pkgIns.exists()) {
-      // 更新
-      pkgIns.update()
-    } else {
-      await pkgIns.install()
-    }
-  }
-
-  const pkgRootFile = pkgIns.getEntryFilePath()
-  if (pkgRootFile) {
-    console.log(pkgRootFile)
-    require(pkgRootFile).apply(null, arguments)
-  }
+  console.log(await pkgIns.exists())
+  // if (!targetPath) {
+  //   if (pkgIns.exists()) {
+  //     // 更新
+  //     pkgIns.update()
+  //   } else {
+  //     await pkgIns.install()
+  //   }
+  // }
+  //
+  // const pkgRootFile = pkgIns.getEntryFilePath()
+  // if (pkgRootFile) {
+  //   console.log('pkgRootFile', pkgRootFile)
+  //   console.log('arguments', arguments)
+  //   require(pkgRootFile).apply(null, arguments)
+  // }
 }
 
 module.exports = exec;
