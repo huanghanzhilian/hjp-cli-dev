@@ -34,17 +34,14 @@ async function exec() {
   })
   if (!targetPath) {
     if (await pkgIns.exists()) {
-      // 更新
-      pkgIns.update()
+      await pkgIns.update()
     } else {
       await pkgIns.install()
     }
   }
 
-  const pkgRootFile = pkgIns.getEntryFilePath()
+  const pkgRootFile = await pkgIns.getEntryFilePath()
   if (pkgRootFile) {
-    console.log('pkgRootFile', pkgRootFile)
-    console.log('arguments', arguments)
     require(pkgRootFile).apply(null, arguments)
   }
 }

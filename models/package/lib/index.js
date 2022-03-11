@@ -27,8 +27,10 @@ class Package {
   async exists() {
     if (this.storePath) {
       //去storePath里找包对应文件夹
-      const pkgFileName = await genPackageFileNameByVersion(this.packageName,this.packageVersion)
-      return pathExists(path.resolve(this.storePath, pkgFileName))
+      const pkgInstallDirName = await genPackageFileNameByVersion(this.packageName, this.packageVersion)
+      const pkgName = this.packageName.includes('/')? this.packageName.split('/')[1] : ''
+      this.path = path.resolve(this.storePath, pkgInstallDirName,pkgName)
+      return pathExists(this.path)
     } else {
       // 判断指定目录的包是否存在
       return !!getPkgDir(this.path)
@@ -62,13 +64,17 @@ class Package {
 
   }
 
-  getEntryFilePath() {
+  async getEntryFilePath() {
+    if (this.storePath && !await this.exists()) {
+      return null
+    }
     const pkgRootDir = getPkgDir(this.path)
     const pkgJsonDir = path.resolve(pkgRootDir, 'package.json')
     const pkgJsonObj = require(pkgJsonDir)
     if (pkgJsonObj && pkgJsonObj.main) {
       return formatPath(path.resolve(pkgRootDir, pkgJsonObj.main))
     }
+    return null
   }
 }
 
@@ -86,6 +92,5 @@ async function genPackageFileNameByVersion(packageName, version) {
   //     _@imooc-cli_init@1.1.2@@imooc-cli
   return `_${packageName.replace(/\//g,'_')}@${specificVersion}@${packageName.split('/')[0]}`
 }
-module.exports = Package;
 
 module.exports = Package;
