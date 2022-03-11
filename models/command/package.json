@@ -1,6 +1,6 @@
 {
-  "name": "@hjp-cli-dev/npm-info",
-  "version": "1.0.6",
+  "name": "@hjp-cli-dev/command",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "huangjipeng <1319639755@qq.com>",
   "homepage": "https://github.com/huanghanzhilian/hjp-cli-dev#readme",
@@ -23,12 +23,12 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
+  "dependencies": {
+    "semver": "^7.3.5",
+    "colors": "^1.4.0",
+    "@hjp-cli-dev/log": "file:../../utils/log"
+  },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
-  },
-  "dependencies": {
-    "axios": "^0.24.0",
-    "semver": "^7.3.5",
-    "url-join": "^4.0.1"
   }
 }

@@ -23,6 +23,9 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
+  "dependencies": {
+    "@hjp-cli-dev/command": "file:../../models/command"
+  },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
   }

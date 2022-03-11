@@ -4,7 +4,7 @@
   "description": "hjp-cli dev",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "installall": "lerna exec npm i"
   },
   "keywords": [],
   "author": "",
