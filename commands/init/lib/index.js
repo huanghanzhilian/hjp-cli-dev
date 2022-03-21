@@ -3,8 +3,12 @@
 const fs = require('fs')
 const Command = require("@hjp-cli-dev/command")
 const inquirer = require('inquirer');
+const semver = require('semver');
 const log = require('@hjp-cli-dev/log')
 const fse = require('fs-extra')
+
+const TYPE_PROJECT = 'project';
+const TYPE_COMPONENT = 'component';
 
 function init(programName, options, commandObj) {
   const cmd = new InitCommand(programName, options, commandObj)
@@ -29,25 +33,100 @@ class InitCommand extends Command {
   }
 
   async prepare() {
-    // 不为空
     if (!this.isDirEmpty()) {
       let isClearDir
       if (!this.force) {
-        // Asks whether clearing the current directory
         const {clearDir} = await inquirer.prompt([
           {
             type: 'confirm',
             name: 'clearDir',
             default: false,
-            message: 'The current directory is not empty.Do you want to clear the current directory ?'
+            message: '当前文件夹不为空，是否继续创建项目？'
           }
         ])
         isClearDir = clearDir
       }
 
       if (isClearDir || this.force) {
-        await fse.emptydir(this.runPath)
+        let {confirmDel} = await inquirer.prompt({
+          type: 'confirm',
+          name: 'confirmDel',
+          message: '是否确认清空当前目录下的文件？',
+          default: false
+        })
+        if (confirmDel) {
+          await fse.emptydir(this.runPath)
+        }
+        return null
+      } else {
+        return null
       }
+
+    }
+    let o = await this.getProjectInfo();
+    console.log(o)
+    return
+  }
+
+  async getProjectInfo() {
+    const isValidName = v => {
+      return /^(@[a-zA-Z0-9-_]+\/)?[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]*|[a-zA-Z0-9])*$/.test(v);
+    }
+
+    let {type} = await inquirer.prompt({
+      type: 'list',
+      name: 'type',
+      message: '请选择创建项目或组件',
+      default: TYPE_PROJECT,
+      choices: [
+        {name: '项目', value: TYPE_PROJECT},
+        {name: '组件', value: TYPE_COMPONENT}
+      ]
+    })
+    let option = {};
+    if (type === TYPE_PROJECT) {
+      option = await inquirer.prompt([{
+        type: 'input',
+        name: 'projectName',
+        message: '请输入项目名称',
+        default: '',
+        validate(val) {
+          const done = this.async()
+          setTimeout(function () {
+            if (!isValidName(val)) {
+              done('请输入有效合法的项目名称');
+              return;
+            }
+            done(null, true);
+          }, 0);
+        }
+      }, {
+        type: 'input',
+        name: 'version',
+        message: '请输入版本号',
+        default: '1.0.0',
+        validate(val) {
+          const done = this.async()
+          setTimeout(function () {
+            if (!semver.valid(val)) {
+              done('请输入有效合法的版本号');
+              return;
+            }
+            done(null, true);
+          }, 0);
+        },
+        filter: function (val) {
+          if (!!semver.valid(val)) {
+            return semver.valid(val);
+          } else {
+            return val;
+          }
+        }
+      }])
+    }
+    return {
+      ...option,
+      type: TYPE_PROJECT
     }
   }
 
