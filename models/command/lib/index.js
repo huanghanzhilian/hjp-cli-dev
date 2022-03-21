@@ -6,11 +6,11 @@ const colors = require('colors/safe') // change cmd text color
 const LOWEST_NODE_VERSION = '12.0.0'
 
 class Command {
-  constructor() {
+  constructor(...args) {
     const chain = Promise.resolve()
     chain.then(() => {
       checkNodeVersion()
-      this.args = arguments
+      this.args = args
       this.initArgs()
       this.init()
       this.exec()
