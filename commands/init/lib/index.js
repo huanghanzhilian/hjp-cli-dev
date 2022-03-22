@@ -39,6 +39,9 @@ class InitCommand extends Command {
       }
       // 1.准备阶段
       const info = await this.prepare();
+
+      console.log(info)
+      return
       // 2.下载模板
       await this.downTemplate(info);
       // 3.安装模板
@@ -155,6 +158,12 @@ class InitCommand extends Command {
             return val;
           }
         }
+      }, {
+        type: 'list',
+        name: 'template',
+        message: '请选择项目模板',
+        default: 0,
+        choices: this.projerctTemplate.map(item => new Object({name: item.name, value: item.npmName}))
       }])
     } else if (type === TYPE_COMPONENT) {
 
