@@ -1,10 +1,16 @@
 'use strict';
 
 const fs = require('fs')
+const path = require("path");
+
+const {homedir} = require('os');
 const Command = require("@hjp-cli-dev/command")
+const customRequest = require('@hjp-cli-dev/request');
+const Package = require('@hjp-cli-dev/package');
+const log = require('@hjp-cli-dev/log')
 const inquirer = require('inquirer');
 const semver = require('semver');
-const log = require('@hjp-cli-dev/log')
+
 const fse = require('fs-extra')
 
 const TYPE_PROJECT = 'project';
@@ -25,10 +31,38 @@ class InitCommand extends Command {
 
   async exec() {
     try {
-      await this.prepare()
-      // 下载内容
+      // 0.获取模板基本信息
+      this.projerctTemplate = await this.getTemplateList();
+
+      if (!this.projerctTemplate || !this.projerctTemplate.length) {
+        throw new Error('无可用项目模板');
+      }
+      // 1.准备阶段
+      const info = await this.prepare();
+      // 2.下载模板
+      await this.downTemplate(info);
+      // 3.安装模板
     } catch (e) {
       log.error('error in init command execution: ', e)
+    }
+  }
+
+  async getTemplateList() {
+    return customRequest('/project/template')
+  }
+
+  async downTemplate(info) {
+    const targetPath = path.resolve(homedir(), '.imooc-cli-dev', 'template');
+    const storePath = path.resolve(homedir(), '.imooc-cli-dev', 'template', 'node_modules');
+    const {npmName, version} = this.projerctTemplate.find(item=>item.npmName === info.template)
+    const pkg = new Package({
+      packageName:npmName,
+      version,
+      targetPath,
+      storePath
+    })
+    if(!await pkg.exists()){
+      await pkg.install();
     }
   }
 
@@ -63,9 +97,8 @@ class InitCommand extends Command {
       }
 
     }
-    let o = await this.getProjectInfo();
-    console.log(o)
-    return
+
+    return await this.getProjectInfo();
   }
 
   async getProjectInfo() {
@@ -123,10 +156,12 @@ class InitCommand extends Command {
           }
         }
       }])
+    } else if (type === TYPE_COMPONENT) {
+
     }
     return {
       ...option,
-      type: TYPE_PROJECT
+      type
     }
   }
 

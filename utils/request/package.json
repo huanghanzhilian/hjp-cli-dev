@@ -1,7 +1,7 @@
 {
-  "name": "@hjp-cli-dev/init",
+  "name": "@hjp-cli-dev/request",
   "version": "1.0.0",
-  "description": "@hjp-cli-dev init",
+  "description": "> TODO: description",
   "author": "huangjipeng <1319639755@qq.com>",
   "homepage": "https://github.com/huanghanzhilian/hjp-cli-dev#readme",
   "license": "ISC",
@@ -23,16 +23,10 @@
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
-  "dependencies": {
-    "@hjp-cli-dev/command": "file:../../models/command",
-    "@hjp-cli-dev/log": "file:../../utils/log",
-    "@hjp-cli-dev/package": "file:../../models/package",
-    "@hjp-cli-dev/request": "file:../../utils/request",
-    "fs-extra": "^10.0.0",
-    "inquirer": "^8.2.0",
-    "semver": "^7.3.5"
-  },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
+  },
+  "dependencies": {
+    "axios": "^0.24.0"
   }
 }
