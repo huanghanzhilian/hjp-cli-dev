@@ -55,7 +55,7 @@ class Package {
     const latestVersion = await getLatestNpmVersion(this.packageName, getDefaultRegistryUrl())
     if (this.packageVersion !== 'latest') {
       if (SemVer.lt(this.packageVersion, latestVersion))
-        return npmInstall({
+        return npminstall({
           root: this.path,
           storeDir: this.storePath,
           registry: getDefaultRegistryUrl(),

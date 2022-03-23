@@ -66,17 +66,27 @@ class InitCommand extends Command {
     })
 
     if(!await pkg.exists()){
-      const spinner = spinnerStart('正在下载模板...')
+      const spinner = spinnerStart('正在下载模板...');
       await sleep();
-      await pkg.install();
-      spinner.stop(true);
-      log.success('下载模板成功');
+      try{
+        await pkg.install();
+        log.success('下载模板成功');
+      }catch(e){
+        throw e;
+      }finally {
+        spinner.stop(true);
+      }
     } else {
       const spinner = spinnerStart('正在更新模板...');
       await sleep();
-      await pkg.update();
-      spinner.stop(true);
-      log.success('更新模板成功');
+      try {
+        await pkg.update();
+        log.success('更新模板成功');
+      }catch(e) {
+        throw e;
+      }finally{
+        spinner.stop(true);
+      }
     }
   }
 
