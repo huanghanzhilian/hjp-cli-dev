@@ -8,6 +8,8 @@ const Command = require("@hjp-cli-dev/command")
 const customRequest = require('@hjp-cli-dev/request');
 const Package = require('@hjp-cli-dev/package');
 const log = require('@hjp-cli-dev/log')
+const { spinnerStart, sleep } = require("@hjp-cli-dev/utils");
+
 const inquirer = require('inquirer');
 const semver = require('semver');
 
@@ -64,9 +66,17 @@ class InitCommand extends Command {
     })
 
     if(!await pkg.exists()){
+      const spinner = spinnerStart('正在下载模板...')
+      await sleep();
       await pkg.install();
+      spinner.stop(true);
+      log.success('下载模板成功');
     } else {
+      const spinner = spinnerStart('正在更新模板...');
+      await sleep();
       await pkg.update();
+      spinner.stop(true);
+      log.success('更新模板成功');
     }
   }
 

@@ -9,5 +9,6 @@ log.headingStyle = {bg:'blue',fg:'black'}
 
 // 添加自定义类型
 log.addLevel('debug', 2000,{ fg: 'yellow' })
+log.addLevel('success', 2000, {fg: 'green', bold: true}); // 添加自定义命令
 
 module.exports = log;

@@ -28,6 +28,7 @@
     "@hjp-cli-dev/log": "file:../../utils/log",
     "@hjp-cli-dev/package": "file:../../models/package",
     "@hjp-cli-dev/request": "file:../../utils/request",
+    "@hjp-cli-dev/utils": "file:../../utils/utils",
     "fs-extra": "^10.0.0",
     "inquirer": "^8.2.0",
     "semver": "^7.3.5"
