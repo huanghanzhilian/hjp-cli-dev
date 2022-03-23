@@ -17,10 +17,13 @@ class Package {
     if (!isObject(options)) {
       throw new Error('argument of class Package\'s must be Object !')
     }
-
+    // package的目标路径
     this.path = options.path
+    // 缓存package的路径
     this.storePath = options.storePath
+    // package的name
     this.packageName = options.name
+    // package的version
     this.packageVersion = options.version
   }
 

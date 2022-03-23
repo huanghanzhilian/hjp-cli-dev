@@ -40,8 +40,6 @@ class InitCommand extends Command {
       // 1.准备阶段
       const info = await this.prepare();
 
-      console.log(info)
-      return
       // 2.下载模板
       await this.downTemplate(info);
       // 3.安装模板
@@ -55,17 +53,20 @@ class InitCommand extends Command {
   }
 
   async downTemplate(info) {
-    const targetPath = path.resolve(homedir(), '.imooc-cli-dev', 'template');
-    const storePath = path.resolve(homedir(), '.imooc-cli-dev', 'template', 'node_modules');
-    const {npmName, version} = this.projerctTemplate.find(item=>item.npmName === info.template)
+    const targetPath = path.resolve(homedir(), '.hjp-cli', 'template');
+    const storePath = path.resolve(homedir(), '.hjp-cli', 'template', 'node_modules');
+    const {npmName, version} = this.projerctTemplate.find(item => item.npmName === info.template)
     const pkg = new Package({
-      packageName:npmName,
-      version,
-      targetPath,
-      storePath
+      name: npmName,
+      path: targetPath,
+      storePath,
+      version
     })
+
     if(!await pkg.exists()){
       await pkg.install();
+    } else {
+      await pkg.update();
     }
   }
 

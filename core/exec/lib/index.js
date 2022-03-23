@@ -42,7 +42,6 @@ async function exec() {
   }
 
   const pkgRootFile = await pkgIns.getEntryFilePath()
-
   if (pkgRootFile) {
     // require(pkgRootFile).apply(null, arguments)
     /*处理参数
