@@ -18,6 +18,9 @@ const fse = require('fs-extra')
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
 
+const TEMPLATE_TYPE_NORMAL = 'normal';
+const TEMPLATE_TYPE_CUSTOM = 'custom';
+
 function init(programName, options, commandObj) {
   const cmd = new InitCommand(programName, options, commandObj)
 }
@@ -39,25 +42,60 @@ class InitCommand extends Command {
       if (!this.projerctTemplate || !this.projerctTemplate.length) {
         throw new Error('无可用项目模板');
       }
-      // 1.准备阶段
-      const info = await this.prepare();
 
-      // 2.下载模板
-      await this.downTemplate(info);
-      // 3.安装模板
+      // 1. 准备阶段
+      const projectInfo = await this.prepare();
+      if (projectInfo) {
+        // 2. 下载模板
+        this.projectInfo = projectInfo;
+        await this.downTemplate();
+        // 3. 安装模板
+        await this.installTemplate();
+      }
     } catch (e) {
       log.error('error in init command execution: ', e)
     }
+  }
+
+  async installTemplate () {
+    log.verbose('templateInfo', this.templateInfo);
+    if (this.templateInfo) {
+      if (!this.templateInfo.type) {
+        this.templateInfo.type = TEMPLATE_TYPE_NORMAL;
+      }
+      if (this.templateInfo.type === TEMPLATE_TYPE_NORMAL) {
+        // 标准安装
+        await this.installNormalTemplate();
+      } else if (this.templateInfo.type === TEMPLATE_TYPE_CUSTOM) {
+        // 自定义安装
+        await this.installCustomTemplate();
+      } else {
+        throw new Error('无法识别项目模板类型!');
+      }
+    }else {
+      throw new Error('项目模板信息不存在！');
+    }
+  }
+
+  async installNormalTemplate () {
+    console.log('安装标准模板');
+  }
+
+  async installCustomTemplate () {
+    console.log('安装自定义模板');
   }
 
   async getTemplateList() {
     return customRequest('/project/template')
   }
 
-  async downTemplate(info) {
+  async downTemplate() {
     const targetPath = path.resolve(homedir(), '.hjp-cli', 'template');
     const storePath = path.resolve(homedir(), '.hjp-cli', 'template', 'node_modules');
-    const {npmName, version} = this.projerctTemplate.find(item => item.npmName === info.template)
+    const { template } = this.projectInfo;
+    const templateInfo = this.projerctTemplate.find(item => item.npmName === template)
+    const { npmName, version } = templateInfo
+    this.templateInfo = templateInfo;
     const pkg = new Package({
       name: npmName,
       path: targetPath,
@@ -70,22 +108,26 @@ class InitCommand extends Command {
       await sleep();
       try{
         await pkg.install();
-        log.success('下载模板成功');
       }catch(e){
         throw e;
       }finally {
         spinner.stop(true);
+        if (await pkg.exists()) {
+          log.success('下载模板成功');
+        }
       }
     } else {
       const spinner = spinnerStart('正在更新模板...');
       await sleep();
       try {
         await pkg.update();
-        log.success('更新模板成功');
       }catch(e) {
         throw e;
       }finally{
         spinner.stop(true);
+        if (await pkg.exists()) {
+          log.success('更新模板成功');
+        }
       }
     }
   }
@@ -184,7 +226,7 @@ class InitCommand extends Command {
         name: 'template',
         message: '请选择项目模板',
         default: 0,
-        choices: this.projerctTemplate.map(item => new Object({name: item.name, value: item.npmName}))
+        choices: this.createTemplateChoices()
       }])
     } else if (type === TYPE_COMPONENT) {
 
@@ -193,6 +235,13 @@ class InitCommand extends Command {
       ...option,
       type
     }
+  }
+
+  createTemplateChoices () {
+    return this.projerctTemplate.map(item => ({
+      value: item.npmName,
+      name: item.name,
+    }));
   }
 
   isDirEmpty() {
