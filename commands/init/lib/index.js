@@ -229,7 +229,7 @@ class InitCommand extends Command {
     const isValidName = v => {
       return /^(@[a-zA-Z0-9-_]+\/)?[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]*|[a-zA-Z0-9])*$/.test(v);
     }
-
+    let projectInfo = {};
     let {type} = await inquirer.prompt({
       type: 'list',
       name: 'type',
@@ -286,13 +286,18 @@ class InitCommand extends Command {
         default: 0,
         choices: this.createTemplateChoices()
       }])
+      projectInfo = {
+        ...option,
+        type
+      }
     } else if (type === TYPE_COMPONENT) {
 
     }
-    return {
-      ...option,
-      type
+    // 生成 classname AbcEfg => abc-efg
+    if (projectInfo.projectName) {
+      projectInfo.className = require('kebab-case')(projectInfo.projectName).replace(/^-/, '');
     }
+    return projectInfo
   }
 
   createTemplateChoices () {
