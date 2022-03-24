@@ -21,6 +21,8 @@ const TYPE_COMPONENT = 'component';
 const TEMPLATE_TYPE_NORMAL = 'normal';
 const TEMPLATE_TYPE_CUSTOM = 'custom';
 
+const WHITE_COMMAND = ['npm', 'cnpm'];
+
 function init(programName, options, commandObj) {
   const cmd = new InitCommand(programName, options, commandObj)
 }
@@ -77,6 +79,33 @@ class InitCommand extends Command {
     }
   }
 
+  checkCommand (cmd) {
+    if(WHITE_COMMAND.includes(cmd)){
+      return cmd;
+    }
+    return null;
+  }
+
+  async execCommand (command, errMsg) {
+    let ret;
+    if (command) {
+      const cmdArray = command.split(' ');
+      const cmd = this.checkCommand(cmdArray[0]);
+      if (!cmd) {
+        throw new Error('命令不存在！命令：' + command);
+      }
+      const args = cmdArray.slice(1);
+      ret = await execAsync(cmd, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+      });
+    }
+    if (ret !== 0) {
+      throw new Error(errMsg);
+    }
+    return ret;
+  }
+
   /**
    * 安装标准模板
    */
@@ -101,34 +130,11 @@ class InitCommand extends Command {
       spinner.stop(true);
       log.success('模板安装成功！');
     }
-
-    console.log(this.templateInfo)
-    // 依赖安装
     const { installCommand, startCommand } = this.templateInfo;
-
-    let installRet;
-    if (installCommand) {
-      const installCmd = installCommand.split(' ');
-      const cmd = installCmd[0];
-      const args = installCmd.slice(1);
-      installRet = await execAsync(cmd, args, {
-        stdio: 'inherit',
-        cwd: process.cwd(),
-      });
-    }
-    if (installRet !== 0) {
-      throw new Error('依赖安装过程中失败！');
-    }
+    // 依赖安装
+    await this.execCommand(installCommand, '依赖安装过程中失败！');
     // 启动命令执行
-    if (startCommand) {
-      const startCmd = startCommand.split(' ');
-      const cmd = startCmd[0];
-      const args = startCmd.slice(1);
-      await execAsync(cmd, args, {
-        stdio: 'inherit',
-        cwd: process.cwd(),
-      });
-    }
+    await this.execCommand(startCommand, '依赖安装过程中失败！');
 
   }
 
