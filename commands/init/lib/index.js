@@ -8,7 +8,7 @@ const Command = require("@hjp-cli-dev/command")
 const customRequest = require('@hjp-cli-dev/request');
 const Package = require('@hjp-cli-dev/package');
 const log = require('@hjp-cli-dev/log')
-const { spinnerStart, sleep } = require("@hjp-cli-dev/utils");
+const { spinnerStart, sleep, execAsync } = require("@hjp-cli-dev/utils");
 
 const inquirer = require('inquirer');
 const semver = require('semver');
@@ -101,6 +101,35 @@ class InitCommand extends Command {
       spinner.stop(true);
       log.success('模板安装成功！');
     }
+
+    console.log(this.templateInfo)
+    // 依赖安装
+    const { installCommand, startCommand } = this.templateInfo;
+
+    let installRet;
+    if (installCommand) {
+      const installCmd = installCommand.split(' ');
+      const cmd = installCmd[0];
+      const args = installCmd.slice(1);
+      installRet = await execAsync(cmd, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+      });
+    }
+    if (installRet !== 0) {
+      throw new Error('依赖安装过程中失败！');
+    }
+    // 启动命令执行
+    if (startCommand) {
+      const startCmd = startCommand.split(' ');
+      const cmd = startCmd[0];
+      const args = startCmd.slice(1);
+      await execAsync(cmd, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+      });
+    }
+
   }
 
   async installCustomTemplate () {
@@ -169,6 +198,7 @@ class InitCommand extends Command {
           }
         ])
         isClearDir = clearDir
+        if (!isClearDir) return
       }
 
       if (isClearDir || this.force) {
@@ -180,12 +210,10 @@ class InitCommand extends Command {
         })
         if (confirmDel) {
           await fse.emptydir(this.runPath)
+        } else {
+          return
         }
-        return null
-      } else {
-        return null
       }
-
     }
 
     return await this.getProjectInfo();

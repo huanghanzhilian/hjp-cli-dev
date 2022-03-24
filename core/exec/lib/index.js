@@ -5,6 +5,7 @@ const cp = require('child_process')
 
 const Package = require('@hjp-cli-dev/package')
 const log = require('@hjp-cli-dev/log')
+const { exec: spawn } = require('@hjp-cli-dev/utils');
 
 module.exports = exec;
 // 指令对应包的配置表
@@ -56,7 +57,7 @@ async function exec() {
     })
     arguments[arguments.length - 1] = commandObj
     const code = `require('${pkgRootFile}').apply(null, ${JSON.stringify(Array.from(arguments))})`
-    const childProcess = compatibilitySpawn('node', ['-e', code], {
+    const childProcess = spawn('node', ['-e', code], {
       cwd: process.cwd(),
       stdio: "inherit"
     })
@@ -69,14 +70,6 @@ async function exec() {
     })
   }
 
-  function compatibilitySpawn(command, args, options) {
-    const win32 = process.platform === 'win32'
-
-    const cmd = win32 ? 'cmg' : command
-    const cmdArgs = win32 ? ['/c'].concat(command, args) : args
-
-    return cp.spawn(cmd, cmdArgs, options || {})
-  }
 }
 
 module.exports = exec;

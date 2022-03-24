@@ -25,7 +25,8 @@
   },
   "dependencies": {
     "@hjp-cli-dev/package": "file:../../models/package",
-    "@hjp-cli-dev/log": "file:../../utils/log"
+    "@hjp-cli-dev/log": "file:../../utils/log",
+    "@hjp-cli-dev/utils": "file:../../utils/utils"
   },
   "bugs": {
     "url": "https://github.com/huanghanzhilian/hjp-cli-dev/issues"
