@@ -25,8 +25,15 @@ class Package {
     this.packageName = options.name
     // package的version
     this.packageVersion = options.version
+    // package 的缓存目录前缀
+    this.cacheFilePathPrefix = this.packageName.replace('/', '_');
   }
 
+  get cacheFilePath () {
+    return path.resolve(this.storePath, `_${this.cacheFilePathPrefix}@${this.packageVersion}@${this.packageName}`);
+  }
+
+  // 判断当前 Package 是否存在
   async exists() {
     if (this.storePath) {
       //去storePath里找包对应文件夹
@@ -40,6 +47,7 @@ class Package {
     }
   }
 
+  // 安装Package
   install() {
     return npminstall({
       root: this.path,
@@ -51,6 +59,7 @@ class Package {
     })
   }
 
+  // 更新Package
   async update() {
     const latestVersion = await getLatestNpmVersion(this.packageName, getDefaultRegistryUrl())
     if (this.packageVersion !== 'latest') {
@@ -67,6 +76,7 @@ class Package {
 
   }
 
+  // 获取入口文件的路径
   async getEntryFilePath() {
     if (this.storePath && !await this.exists()) {
       return null

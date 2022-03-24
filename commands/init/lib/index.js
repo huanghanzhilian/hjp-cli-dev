@@ -77,8 +77,30 @@ class InitCommand extends Command {
     }
   }
 
+  /**
+   * 安装标准模板
+   */
   async installNormalTemplate () {
-    console.log('安装标准模板');
+    // 拷贝模板代码至当前目录
+    let spinner = spinnerStart('正在安装模板...');
+    await sleep();
+    try {
+      // 去缓存目录中拿template下的文件路径
+      const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+      //当前执行脚手架目录
+      const targetPath = process.cwd();
+      //确保使用前缓存生成目录存在，若不存在则创建
+      fse.ensureDirSync(templatePath);
+      //确保当前脚手架安装目录存在，若不存在则创建
+      fse.ensureDirSync(targetPath);
+      //将缓存目录下文件copy至当前目录
+      fse.copySync(templatePath, targetPath);
+    }catch(e){
+      throw e;
+    } finally {
+      spinner.stop(true);
+      log.success('模板安装成功！');
+    }
   }
 
   async installCustomTemplate () {
@@ -114,6 +136,7 @@ class InitCommand extends Command {
         spinner.stop(true);
         if (await pkg.exists()) {
           log.success('下载模板成功');
+          this.templateNpm = pkg;
         }
       }
     } else {
@@ -127,6 +150,7 @@ class InitCommand extends Command {
         spinner.stop(true);
         if (await pkg.exists()) {
           log.success('更新模板成功');
+          this.templateNpm = pkg;
         }
       }
     }
