@@ -32,7 +32,7 @@ class InitCommand extends Command {
 
   init() {
     if (!this.args.length) throw new Error('argument of init command is required')
-    this.projectName = arguments[0]
+    this.projectName = this.args[0]
     this.force = this.args[1].force
     this.runPath = process.cwd()
   }
@@ -269,6 +269,13 @@ class InitCommand extends Command {
       return /^(@[a-zA-Z0-9-_]+\/)?[a-zA-Z]+([-][a-zA-Z][a-zA-Z0-9]*|[_][a-zA-Z][a-zA-Z0-9]*|[a-zA-Z0-9])*$/.test(v);
     }
     let projectInfo = {};
+
+    let isProjectNameValid = false;
+    if (isValidName(this.projectName)) {
+      isProjectNameValid = true;
+      projectInfo.projectName = this.projectName;
+    }
+
     let {type} = await inquirer.prompt({
       type: 'list',
       name: 'type',
@@ -281,7 +288,7 @@ class InitCommand extends Command {
     })
     let option = {};
     if (type === TYPE_PROJECT) {
-      option = await inquirer.prompt([{
+      const projectNamePrompt = {
         type: 'input',
         name: 'projectName',
         message: '请输入项目名称',
@@ -296,7 +303,14 @@ class InitCommand extends Command {
             done(null, true);
           }, 0);
         }
-      }, {
+      }
+
+      const projectPrompt = [];
+      if (!isProjectNameValid) {
+        projectPrompt.push(projectNamePrompt);
+      }
+
+      projectPrompt.push({
         type: 'input',
         name: 'version',
         message: '请输入版本号',
@@ -324,8 +338,11 @@ class InitCommand extends Command {
         message: '请选择项目模板',
         default: 0,
         choices: this.createTemplateChoices()
-      }])
+      })
+
+      option = await inquirer.prompt(projectPrompt)
       projectInfo = {
+        ...projectInfo,
         ...option,
         type
       }
