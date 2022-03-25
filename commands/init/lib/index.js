@@ -127,7 +127,6 @@ class InitCommand extends Command {
           return new Promise((resolve1, reject1) => {
             ejs.renderFile(filePath, projectInfo, {}, (err, result) => {
               if (err) {
-                console.log('err', file)
                 reject1(err);
               } else {
                 fse.writeFileSync(filePath, result);
@@ -181,7 +180,25 @@ class InitCommand extends Command {
   }
 
   async installCustomTemplate () {
-    console.log('安装自定义模板');
+    // 查询自定义模板的入口文件
+    if (await this.templateNpm.exists()) {
+      const rootFile = await this.templateNpm.getEntryFilePath();
+      if (fs.existsSync(rootFile)) {
+        log.notice('开始执行自定义模板');
+        const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
+        const options = {
+          templateInfo: this.templateInfo,
+          projectInfo: this.projectInfo,
+          sourcePath: templatePath,
+          targetPath: process.cwd(),
+        };
+        const code = `require('${rootFile}')(${JSON.stringify(options)})`;
+        await execAsync('node', ['-e', code], {stdio: 'inherit', cwd: process.cwd()});
+        log.success('自定义模板安装成功');
+      } else {
+        throw new Error('自定义模板入口文件不存在！');
+      }
+    }
   }
 
   async getTemplateList() {
