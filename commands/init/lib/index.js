@@ -2,18 +2,19 @@
 
 const fs = require('fs')
 const path = require("path");
-
 const {homedir} = require('os');
+
+const inquirer = require('inquirer');
+const semver = require('semver');
+const fse = require('fs-extra')
+const glob = require('glob');
+const ejs = require('ejs');
+
 const Command = require("@hjp-cli-dev/command")
 const customRequest = require('@hjp-cli-dev/request');
 const Package = require('@hjp-cli-dev/package');
 const log = require('@hjp-cli-dev/log')
 const { spinnerStart, sleep, execAsync } = require("@hjp-cli-dev/utils");
-
-const inquirer = require('inquirer');
-const semver = require('semver');
-
-const fse = require('fs-extra')
 
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
@@ -56,6 +57,9 @@ class InitCommand extends Command {
       }
     } catch (e) {
       log.error('error in init command execution: ', e)
+      if (process.env.LOG_LEVEL === 'verbose') {
+        console.log(e);
+      }
     }
   }
 
@@ -106,6 +110,39 @@ class InitCommand extends Command {
     return ret;
   }
 
+  async ejsRender (options) {
+    const dir = process.cwd();
+    const projectInfo = this.projectInfo;
+    return new Promise((resolve, reject) => {
+      glob('**', {
+        cwd: dir,
+        ignore: options.ignore || '',
+        nodir: true,
+      }, (err, files) => {
+        if (err) {
+          reject(err);
+        }
+        Promise.all(files.map(file => {
+          const filePath = path.join(dir, file);
+          return new Promise((resolve1, reject1) => {
+            ejs.renderFile(filePath, projectInfo, {}, (err, result) => {
+              if (err) {
+                reject1(err);
+              } else {
+                fse.writeFileSync(filePath, result);
+                resolve1(result);
+              }
+            });
+          });
+        })).then(() => {
+          resolve();
+        }).catch(err => {
+          reject(err);
+        });
+      })
+    });
+  }
+
   /**
    * 安装标准模板
    */
@@ -130,6 +167,8 @@ class InitCommand extends Command {
       spinner.stop(true);
       log.success('模板安装成功！');
     }
+    const ignore = ['node_modules/**', 'public/**'];
+    await this.ejsRender({ ignore });
     const { installCommand, startCommand } = this.templateInfo;
     // 依赖安装
     await this.execCommand(installCommand, '依赖安装过程中失败！');
@@ -295,8 +334,13 @@ class InitCommand extends Command {
     }
     // 生成 classname AbcEfg => abc-efg
     if (projectInfo.projectName) {
+      projectInfo.name = projectInfo.projectName;
       projectInfo.className = require('kebab-case')(projectInfo.projectName).replace(/^-/, '');
     }
+    if (projectInfo.version) {
+      projectInfo.version = projectInfo.version;
+    }
+    //  return 项目的基本信息(object)
     return projectInfo
   }
 

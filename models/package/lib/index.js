@@ -61,10 +61,11 @@ class Package {
 
   // 更新Package
   async update() {
+    // 1. 获取最新的 npm 模块版本号
     const latestVersion = await getLatestNpmVersion(this.packageName, getDefaultRegistryUrl())
     if (this.packageVersion !== 'latest') {
-      if (SemVer.lt(this.packageVersion, latestVersion))
-        return npminstall({
+      if (SemVer.lt(this.packageVersion, latestVersion)) {
+        await npminstall({
           root: this.path,
           storeDir: this.storePath,
           registry: getDefaultRegistryUrl(),
@@ -72,6 +73,10 @@ class Package {
             {name: this.packageName, version: 'latest'}
           ]
         })
+      }
+      this.packageVersion = latestVersion
+    } else {
+      this.packageVersion = latestVersion
     }
 
   }
