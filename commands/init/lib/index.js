@@ -167,7 +167,9 @@ class InitCommand extends Command {
       spinner.stop(true);
       log.success('模板安装成功！');
     }
-    const ignore = ['node_modules/**', 'public/**'];
+    const templateIgnore = this.templateInfo.ignore || [];
+    const ignore = ['**/node_modules/**', ...templateIgnore];
+
     await this.ejsRender({ ignore });
     const { installCommand, startCommand } = this.templateInfo;
     // 依赖安装
@@ -287,6 +289,8 @@ class InitCommand extends Command {
       ]
     })
     let option = {};
+    this.projerctTemplate = this.projerctTemplate.filter(template => template.tag.includes(type));
+    console.log(this.projerctTemplate);
     if (type === TYPE_PROJECT) {
       const projectNamePrompt = {
         type: 'input',
